@@ -18,26 +18,32 @@
         android:layout_height="wrap_content"
         android:text="@string/send_output_text"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
 
-
         <EditText
             android:id="@+id/outputSendText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ems="12"></EditText>
+            android:layout_weight="1"
+            android:ems="12"
+            android:hint="@string/text_to_send_hint"
+            android:inputType="@string/send_output_text"
+            android:minHeight="48dp"
+            android:singleLine="true"
+            tools:ignore="SpeakableTextPresentCheck"></EditText>
 
         <Button
             android:id="@+id/buttonSend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send" />
+            android:minHeight="48dp"
+            android:text="@string/send"
+            tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
 
@@ -61,23 +67,14 @@
         android:scrollbars="vertical"
         android:textColor="@android:color/primary_text_dark" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="@string/enable_monitor_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:onClick="toggleMonitor" />
-
-    </LinearLayout>
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:minHeight="48dp"
+        android:onClick="toggleMonitor"
+        android:text="@string/enable_monitor_label"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
     <Space
         android:layout_width="match_parent"
@@ -95,11 +92,11 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:padding="@dimen/activity_horizontal_margin"
         android:layout_gravity="end"
+        android:background="@color/colorAccent"
+        android:onClick="stopServiceAndFinish"
+        android:padding="@dimen/activity_horizontal_margin"
         android:text="@string/stop_app"
-        android:onClick="stopServiceAndFinish"/>
+        android:textColor="#212121" />
 
 </LinearLayout>

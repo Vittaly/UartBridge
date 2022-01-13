@@ -22,4 +22,6 @@
     <string translatable="false" name="usb_speed_default">115200</string>
     <string name="notification_message">Running</string>
     <string name="stop_app">STOP !</string>
+    <string name="send">Send</string>
+    <string name="text_to_send_hint">Text to send to device</string>
 </resources>
