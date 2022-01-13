@@ -25,17 +25,22 @@
         android:orientation="horizontal">
 
 
-        <EditText
+         <EditText
             android:id="@+id/outputSendText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="12"
             android:hint="@string/text_to_send_hint"
-            android:inputType="@string/send_output_text"
             android:minHeight="48dp"
             android:singleLine="true"
-            tools:ignore="SpeakableTextPresentCheck"></EditText>
+         >
+        </EditText> 
+        <!-- android:ems="12"
+            android:hint="@string/text_to_send_hint"
+            android:inputType="@string/send_output_text"
+            android:minHeight="48dp"
+            android:singleLine="true"> -->
 
         <Button
             android:id="@+id/buttonSend"

@@ -3,15 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="@string/pref_category_network_title"
-        android:key="@string/pref_category_network_key" >
+        android:key="@string/pref_category_network_key"
+        android:textColor="#00796B"
+        android:title="@string/pref_category_network_title">
 
-    <com.manichord.uartbridge.IntEditTextPreference
-        android:key="@string/network_port_preference"
-        android:title="@string/title_network_port_preference"
-        android:defaultValue="@string/port_default"
-        android:summary="@string/summary_network_port_preference" />
-
+        <com.manichord.uartbridge.IntEditTextPreference
+            android:defaultValue="@string/port_default"
+            android:key="@string/network_port_preference"
+            android:summary="@string/summary_network_port_preference"
+            android:title="@string/title_network_port_preference" />
     </PreferenceCategory>
 
     <PreferenceCategory
