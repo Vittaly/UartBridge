@@ -216,6 +216,22 @@ public class UsbService extends Service {
             sendBroadcast(intent);
         }
     }
+    /*
+     * Return using usb device name
+     */
+    public String getDeviceName() {
+     if (device == null) return "";
+     return device.getDeviceName();
+
+    }
+    /*
+     * Return using Port
+     */
+    public int getPort() {
+        if (device == null) return 0;
+        return mSocketServer.getPort();   
+       }
+
 
     private IntentFilter getFilter() {
         IntentFilter filter = new IntentFilter();
@@ -258,6 +274,8 @@ public class UsbService extends Service {
             return UsbService.this;
         }
     }
+
+    
 
     /*
      * A simple thread to open a serial port.

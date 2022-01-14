@@ -21,6 +21,24 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "gradle",
+            "id": "c:\\Temp\\git\\UartBridgeapp:assembleapp",
+            "script": "app:assemble",
+            "description": "Assemble main outputs for all the variants.",
+            "group": "build",
+            "project": "app",
+            "buildFile": "C:\\Temp\\git\\UartBridge\\app\\build.gradle",
+            "rootProject": "UartBridge",
+            "projectFolder": "c:\\Temp\\git\\UartBridge",
+            "workspaceFolder": "c:\\Temp\\git\\UartBridge",
+            "args": "",
+            "javaDebug": false,
+            "problemMatcher": [
+                "$gradle"
+            ],
+            "label": "gradle: app:assemble"
         }
     ]
 }

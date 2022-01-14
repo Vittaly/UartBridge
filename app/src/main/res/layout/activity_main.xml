@@ -8,7 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:focusable="true"
-    android:focusableInTouchMode="true"
     tools:context="com.manichord.uartbridge.MainActivity"
     android:weightSum="1">
 
@@ -17,12 +16,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/send_output_text"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" >
+       
+    </TextView>
+
+    <TextView
+        android:id="@+id/textViewStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/status"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium">
+
+    </TextView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:focusable="true">
 
 
          <EditText
@@ -34,13 +45,10 @@
             android:hint="@string/text_to_send_hint"
             android:minHeight="48dp"
             android:singleLine="true"
+            android:focusable="true"
          >
+         <requestFocus />
         </EditText> 
-        <!-- android:ems="12"
-            android:hint="@string/text_to_send_hint"
-            android:inputType="@string/send_output_text"
-            android:minHeight="48dp"
-            android:singleLine="true"> -->
 
         <Button
             android:id="@+id/buttonSend"
@@ -48,7 +56,8 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:text="@string/send"
-            tools:ignore="TouchTargetSizeCheck" />
+            tools:ignore="TouchTargetSizeCheck"
+            android:focusable="true" />
 
     </LinearLayout>
 
@@ -79,7 +88,8 @@
         android:minHeight="48dp"
         android:onClick="toggleMonitor"
         android:text="@string/enable_monitor_label"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" 
+        android:focusable="true"/>
 
     <Space
         android:layout_width="match_parent"
@@ -92,16 +102,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:onClick="showSettings"
-        android:text="@string/action_settings" />
+        android:text="@string/action_settings" 
+        android:focusable="true"/>
 
     <Button
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:onClick="stopServiceAndFinish"
+        android:text="@string/stop_app"
+        android:focusable="true"/>
+
+
+        <!-- android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:background="@color/colorAccent"
         android:onClick="stopServiceAndFinish"
         android:padding="@dimen/activity_horizontal_margin"
         android:text="@string/stop_app"
-        android:textColor="#212121" />
+        android:textColor="#212121" 
+        android:focusable="true"-->
 
 </LinearLayout>

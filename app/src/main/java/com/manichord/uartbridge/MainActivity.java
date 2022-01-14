@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
 
     private UsbService usbService;
     private TextView display;
+    private TextView TextViewStatus;
     private EditText editText;
     private MyHandler mHandler;
     private boolean mMonitorEnabled = true;
@@ -64,6 +65,8 @@ public class MainActivity extends Activity {
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
+            showStatus(usbService.getDeviceName(), usbService.getPort(), 1);
+            
         }
 
         @Override
@@ -82,6 +85,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         mHandler = new MyHandler(this);
+
+        TextViewStatus = (TextView) findViewById(R.id.textViewStatus);
 
         display = (TextView) findViewById(R.id.outputMonitor);
         display.setMovementMethod(new ScrollingMovementMethod());
@@ -162,6 +167,11 @@ public class MainActivity extends Activity {
         if (mMonitorEnabled) {
             display.append(data);
         }
+    }
+
+    private void showStatus(String deviceName, int PortNum, int serviceStatus) {
+
+        TextViewStatus.setText(String.format("Device Name: %s, Serivce status: %d, Listen port: %d", deviceName, serviceStatus, PortNum));
     }
 
     /*
