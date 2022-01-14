@@ -46,6 +46,7 @@
             android:minHeight="48dp"
             android:singleLine="true"
             android:focusable="true"
+            android:nextFocusDown="@+id/checkBoxMonitor"
          >
          <requestFocus />
         </EditText> 
@@ -82,6 +83,7 @@
         android:textColor="@android:color/primary_text_dark" />
 
     <CheckBox
+        android:id="@+id/checkBoxMonitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="true"
@@ -89,7 +91,9 @@
         android:onClick="toggleMonitor"
         android:text="@string/enable_monitor_label"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" 
-        android:focusable="true"/>
+        android:focusable="true"
+        android:nextFocusUp="@+id/outputSendText"
+        />
 
     <Space
         android:layout_width="match_parent"
