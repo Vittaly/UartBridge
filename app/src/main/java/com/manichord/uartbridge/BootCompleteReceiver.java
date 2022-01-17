@@ -18,7 +18,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
                 context.getResources().getString(R.string.your_message), Toast.LENGTH_LONG);
         toast.show();*/
         Timber.d("message ACTION_BOOT_COMPLETED received.");
-        Intent i = new Intent(context, UsbService.getClass());
+        Intent i = new Intent(context, UsbService.class);
         
         context.startService(i); // Start UsbService
         Timber.d("service started.");

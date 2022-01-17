@@ -50,7 +50,7 @@
                 "--activity-brought-to-front",
                 "-a android.intent.action.MAIN",
                 "-c android.intent.category.LAUNCHER",
-                "-n package.name/launch.activity"
+                "-n com.manichord.uartbridge/MainActivity"
             ],
 
             // Manually specify the activity to run when the app is started. This option is
@@ -62,13 +62,8 @@
             "postLaunchPause": 1000,
 
             // Set to true to output debugging logs for diagnostics.
-            "trace": false
-        }, {
-                    "type": "android",
-                    "request": "launch",
-                    "name": "App Build & Launch",
-                    "preLaunchTask": "run gradle"
-                }
+            "trace": true
+        }
     ]
     
 }
