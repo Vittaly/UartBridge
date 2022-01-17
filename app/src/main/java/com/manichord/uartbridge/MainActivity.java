@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
-            showStatus(usbService.getDeviceName(), usbService.getPort(), 1);
+           // showStatus(usbService.getDeviceName(), usbService.getPort(), 1);
             
         }
 

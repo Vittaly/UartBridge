@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.manichord.uartbridge">
+    package="com.manichord.uartbridge"
+    android:installLocation="internalOnly"
+    >
+    
 
     <uses-feature
         android:name="android.hardware.usb.host"
@@ -11,6 +14,7 @@
         android:required="false" />
     
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".UartApplication"
@@ -37,9 +41,21 @@
 
         <activity android:name=".SettingsActivity" />
 
+        <receiver
+            android:name=".BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".UsbService"
-            android:enabled="true">
+            android:enabled="true"
+            android:directBootAware="true"
+            android:exported="true"
+            >
         </service>
     </application>
 
