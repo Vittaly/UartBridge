@@ -17,16 +17,19 @@ public class SocketServer {
     private AsyncServer asyncServer;
     private AsyncServerSocket asyncSocket;
     private AsyncNetworkSocket asyncClient;
+    private UsbService usbService;
 
-    public SocketServer(int serverPort) {
+    public SocketServer(int serverPort, UsbService us) {
         asyncServer = new AsyncServer();
         asyncSocket = asyncServer.listen(null, serverPort, listenCallback);
+        usbService = us;
     }
 
     public int getPort(){
         if (asyncSocket == null) return 0;
         return  asyncSocket.getLocalPort();
     }
+   
 
     private ListenCallback listenCallback = new ListenCallback() {
         @Override
@@ -39,7 +42,10 @@ public class SocketServer {
             asyncClient.setDataCallback(new DataCallback() {
                 @Override
                 public void onDataAvailable(DataEmitter emitter, ByteBufferList bb) {
-                    Timber.i("Data received: %s", bb.readString());
+                    byte[]  bytes = bb.getAllByteArray();
+                    Timber.i("Data received: %s", usbService.bytesToHex(bytes));
+                    usbService.write(bytes);
+
                 }
             });
             asyncClient.setClosedCallback(new CompletedCallback() {
@@ -64,9 +70,9 @@ public class SocketServer {
     };
 
     // call this method to send data to the client socket
-    public void sendData(String message) {
+    public void sendData(byte[] message) {
         if (asyncClient != null) {
-            asyncClient.write(new ByteBufferList(message.getBytes()));
+            asyncClient.write(new ByteBufferList(message));
             Timber.d("Data sent: %s", message);
         } else {
             Timber.e("cannot send data - socket not yet ready");

@@ -67,6 +67,17 @@ public class UsbService extends Service {
     private boolean serialPortConnected;
     private SocketServer mSocketServer;
 
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
 
     private Notification getNotification (){
         
@@ -111,7 +122,7 @@ public class UsbService extends Service {
                 if (mHandler != null) {
                     mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, data).sendToTarget();
                 }
-                mSocketServer.sendData(data);
+                mSocketServer.sendData(arg0);
             } catch (UnsupportedEncodingException e) {
                 Timber.e(e, "");
             }
@@ -177,7 +188,7 @@ public class UsbService extends Service {
         findSerialPortDevice();
 
         mPrefs = (PrefHelper) getApplicationContext().getSystemService(PrefHelper.class.getName());
-        mSocketServer = new SocketServer(mPrefs.getNetworkPort());
+        mSocketServer = new SocketServer(mPrefs.getNetworkPort(), this);
         makeForeground();
     }
 
@@ -207,7 +218,7 @@ public class UsbService extends Service {
             serialPort.write(data);
 
         // write to socket as well, useful for debugging
-        mSocketServer.sendData(new String(data));
+       // mSocketServer.sendData(new String(data));
 
     }
 
@@ -259,7 +270,7 @@ public class UsbService extends Service {
      */
     public String getDeviceName() {
      if (device == null) return "";
-     return device.getDeviceName();
+     return device.getProductName();
 
     }
     /*
