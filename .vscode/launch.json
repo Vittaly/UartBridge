@@ -50,7 +50,7 @@
                 "--activity-brought-to-front",
                 "-a android.intent.action.MAIN",
                 "-c android.intent.category.LAUNCHER",
-                "-n com.manichord.uartbridge/MainActivity"
+                "-n com.manichord.uartbridge/com.manichord.uartbridge.MainActivity"
             ],
 
             // Manually specify the activity to run when the app is started. This option is

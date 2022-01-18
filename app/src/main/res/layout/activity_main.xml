@@ -48,7 +48,13 @@
             android:focusable="true"
             android:nextFocusDown="@+id/checkBoxMonitor"
          >
-         <requestFocus />
+         <requestFocus /> 
+         
+<!-- 
+            
+            
+            -->
+
         </EditText> 
 
         <Button

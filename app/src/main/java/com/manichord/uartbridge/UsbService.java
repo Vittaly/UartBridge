@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import timber.log.Timber;
+import android.os.Build;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 
 
 /**
@@ -49,6 +52,9 @@ public class UsbService extends Service {
     public static final int MESSAGE_FROM_SERIAL_PORT = 0;
     public static boolean SERVICE_CONNECTED = false;
 
+    public static final String NOTIFICATION_CHANNEL_ID_SERVICE = "com.manichord.uartbridge.UsbService";
+    public static final String NOTIFICATION_CHANNEL_ID_TASK = "com.manichord.uartbridge.download_info";
+
     private IBinder binder = new UsbBinder();
 
     private Context context;
@@ -60,6 +66,36 @@ public class UsbService extends Service {
     private PrefHelper mPrefs;
     private boolean serialPortConnected;
     private SocketServer mSocketServer;
+
+
+    private Notification getNotification (){
+        
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            nm.createNotificationChannel(new NotificationChannel(NOTIFICATION_CHANNEL_ID_SERVICE, "App Service", NotificationManager.IMPORTANCE_DEFAULT));
+           // nm.createNotificationChannel(new NotificationChannel(NOTIFICATION_CHANNEL_ID_INFO, "Download Info", NotificationManager.IMPORTANCE_DEFAULT));
+           return new Notification.Builder(context, NOTIFICATION_CHANNEL_ID_SERVICE)
+           .setContentTitle(getText(R.string.app_name))
+           .setContentText(getText(R.string.notification_message))
+           .setSmallIcon(R.drawable.app_icon)
+           .setContentIntent(pendingIntent)
+           .build();
+        
+        } else
+        {return new Notification.Builder(context)
+                .setContentTitle(getText(R.string.app_name))
+                .setContentText(getText(R.string.notification_message))
+                .setSmallIcon(R.drawable.app_icon)
+                .setContentIntent(pendingIntent)
+                .build();
+            
+            
+            }
+    }
+
+
 
     /*
      *  Data received from serial port will be received here. Just populate onReceivedData with your code
@@ -258,15 +294,10 @@ public class UsbService extends Service {
      *
      */
     private void makeForeground() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        Notification notification = new Notification.Builder(context)
-                .setContentTitle(getText(R.string.app_name))
-                .setContentText(getText(R.string.notification_message))
-                .setSmallIcon(R.drawable.app_icon)
-                .setContentIntent(pendingIntent)
-                .build();
+        Notification notification = getNotification();
+
+
 
         startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
