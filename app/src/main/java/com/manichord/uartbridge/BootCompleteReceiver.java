@@ -18,9 +18,18 @@ public class BootCompleteReceiver extends BroadcastReceiver {
                 context.getResources().getString(R.string.your_message), Toast.LENGTH_LONG);
         toast.show();*/
         Timber.d("message ACTION_BOOT_COMPLETED received.");
+        PrefHelper mPrefs = (PrefHelper) getApplicationContext().getSystemService(PrefHelper.class.getName());
+        if (!mPrefs.getStartOnBoot()) return;
+
         Intent i = new Intent(context, UsbService.class);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+          context.startForegroundService(i);
+      } else {
+          context.startService(i);
+      }
         
-        context.startService(i); // Start UsbService
+      //  context.startService(i); // Start UsbService
         Timber.d("service started.");
         
       }

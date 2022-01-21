@@ -128,6 +128,14 @@ public class UsbService extends Service {
             }
         }
     };
+    private void onPermitionGranted(Context arg0){
+        connection = usbManager.openDevice(device);
+        Timber.i("usbManager.openDevice ok");
+        serialPortConnected = true;
+        new ConnectionThread().run();
+        Timber.i("ConnectionThread().run() ok");
+
+    }
 
     /*
      * Different notifications from OS will be received here (USB attached, detached, permission responses...)
@@ -135,17 +143,14 @@ public class UsbService extends Service {
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
-            if (arg1.getAction().equals(ACTION_USB_PERMISSION)) {
-                boolean granted = arg1.getExtras().getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED);
-                if (granted) // User accepted our USB connection. Try to open the device as a serial port
+            if (arg1.getAction().equals(ACTION_USB_PERMISSION_GRANTED)) {
+                onPermitionGranted(arg0); 
+            }
+            else if (arg1.getAction().equals(ACTION_USB_PERMISSION) ) {
+            
+                if (arg1.getExtras().getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED)) // User accepted our USB connection. Try to open the device as a serial port
                 {
-                    Intent intent = new Intent(ACTION_USB_PERMISSION_GRANTED);
-                    arg0.sendBroadcast(intent);
-                    connection = usbManager.openDevice(device);
-                    Timber.d("usbManager.openDevice ok");
-                    serialPortConnected = true;
-                    new ConnectionThread().run();
-                    Timber.d("ConnectionThread().run() ok");
+                    onPermitionGranted(arg0);
                 } else // User not accepted our USB connection. Send an Intent to the Main Activity
                 {
                     Intent intent = new Intent(ACTION_USB_PERMISSION_NOT_GRANTED);
@@ -236,7 +241,6 @@ public class UsbService extends Service {
             return;
         }
         if (!usbDevices.isEmpty()) {
-            boolean keep = true;
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
                 device = entry.getValue();
                 int deviceVID = device.getVendorId();
@@ -244,17 +248,22 @@ public class UsbService extends Service {
 
                 if (UsbSerialDevice.isSupported(device)) {
                     // There is a device connected to our Android device. Try to open it as a Serial Port.
+                    if (usbManager.hasPermission(device)){
+                        Timber.i("Has permission on device");
+                        //onPermissionGranted(getApplicationContext());
+                        Intent intent = new Intent(ACTION_USB_PERMISSION_GRANTED);
+                        getApplicationContext().sendBroadcast(intent);
+
+                    } else{
+                        Timber.i("No permission on device. Request...");
                     requestUserPermission();
-                    keep = false;
+                    }
                 } else {
                     connection = null;
                     device = null;
                 }
-
-                if (!keep)
-                    break;
             }
-            if (!keep) {
+            if (device == null) {
                 // There is no USB devices connected (but usb host were listed). Send an intent to MainActivity.
                 Intent intent = new Intent(ACTION_NO_USB);
                 sendBroadcast(intent);
@@ -285,6 +294,7 @@ public class UsbService extends Service {
     private IntentFilter getFilter() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
+        filter.addAction(ACTION_USB_PERMISSION_GRANTED);
         filter.addAction(ACTION_USB_DETACHED);
         filter.addAction(ACTION_USB_ATTACHED);
         return filter;
