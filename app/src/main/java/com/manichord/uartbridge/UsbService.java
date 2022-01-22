@@ -247,7 +247,10 @@ public class UsbService extends Service {
         this.mHandler = mHandler;
     }
 
+    static String getDevInfo(UsbDevice dev){
+       return String.format("Name: %s , VID:%s, ID:%s", dev.getProductName(), dev.getVendorId(), dev.getProductId());
 
+    }
     private void findSerialPortDevice(UsbDevice dev) {
         String devNameFilter = mPrefs.getUsbDevFilter();
             Timber.d("device filter: %s", devNameFilter);
@@ -257,7 +260,7 @@ public class UsbService extends Service {
             DevName = dev.getProductName();
             deviceVID = dev.getVendorId();
             devicePID = dev.getProductId();
-            Timber.d("Check device  from event. Name: %s ",DevName );
+            Timber.d("Check device  from event. %s", getDevInfo(dev) );
             if (UsbSerialDevice.isSupported(dev) && (devNameFilter == "" || DevName.toLowerCase().contains(devNameFilter.toLowerCase()))) {
                 // There is a device connected to our Android device. Try to open it as a Serial Port.
                 if (usbManager.hasPermission(dev)){
@@ -287,11 +290,9 @@ public class UsbService extends Service {
             
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
                 dev = entry.getValue();
-                deviceVID = dev.getVendorId();
-                devicePID = dev.getProductId();
                 DevName = dev.getProductName();
                 
-                   Timber.d("Check device name: %s ",DevName );
+                   Timber.d("Check device name: %s ",getDevInfo(dev) );
 
                 if (UsbSerialDevice.isSupported(dev) && (devNameFilter == "" || DevName.toLowerCase().contains(devNameFilter.toLowerCase()))) {
                     // There is a device connected to our Android device. Try to open it as a Serial Port.

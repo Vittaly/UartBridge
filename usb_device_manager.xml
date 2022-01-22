@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<settings>
+    <preference package="com.manichord.uartbridge">
+        <usb-device vendor-id="17224" />
+		<usb-device vendor-id="6790" />
+    </preference>
+</settings>
