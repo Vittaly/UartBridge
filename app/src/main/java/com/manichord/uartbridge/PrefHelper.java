@@ -44,6 +44,16 @@ public class PrefHelper {
         return getInt(mContext.getString(R.string.usb_speed_preference));
     }
 
+    public String getUsbDevFilter() {
+        return getString(mContext.getString(R.string.usb_dev_filter_preference));
+    }
+
+    public boolean getStartOnBoot() {
+        return getBoolean(mContext.getString(R.string.start_on_boot_preference));
+    }
+
+
+
     private void edit(String name, String value) {
         SharedPreferences.Editor editor = mPrefs.edit();
         editor.putString(name, value);

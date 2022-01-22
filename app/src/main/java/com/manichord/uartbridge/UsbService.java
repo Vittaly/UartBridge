@@ -29,6 +29,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
 
+
 /**
  * Based on example from:
  * https://github.com/felHR85/SerialPortExample/blob/master/example/src/main/java/com/felhr/serialportexample/UsbService.java
@@ -128,7 +129,7 @@ public class UsbService extends Service {
             }
         }
     };
-    private void onPermitionGranted(Context arg0){
+    private void onPermissionGranted(Context arg0){
         connection = usbManager.openDevice(device);
         Timber.i("usbManager.openDevice ok");
         serialPortConnected = true;
@@ -144,27 +145,37 @@ public class UsbService extends Service {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             if (arg1.getAction().equals(ACTION_USB_PERMISSION_GRANTED)) {
-                onPermitionGranted(arg0); 
+                onPermissionGranted(arg0); 
             }
             else if (arg1.getAction().equals(ACTION_USB_PERMISSION) ) {
             
                 if (arg1.getExtras().getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED)) // User accepted our USB connection. Try to open the device as a serial port
                 {
-                    onPermitionGranted(arg0);
+                   if (device != null) onPermissionGranted(arg0);
                 } else // User not accepted our USB connection. Send an Intent to the Main Activity
                 {
                     Intent intent = new Intent(ACTION_USB_PERMISSION_NOT_GRANTED);
                     arg0.sendBroadcast(intent);
                 }
             } else if (arg1.getAction().equals(ACTION_USB_ATTACHED)) {
-                if (!serialPortConnected)
-                    findSerialPortDevice(); // A USB device has been attached. Try to open it as a Serial port
+                Timber.i("ACTION_USB_ATTACHED received");
+                if (!serialPortConnected){
+                    Timber.i("ACTION_USB_ATTACHED: serialPortConnected = false");
+                    UsbDevice dev = (UsbDevice)arg1.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    Timber.i("ACTION_USB_ATTACHED: EXTRA_DEVICE complete");
+                    findSerialPortDevice(dev); // A USB device has been attached. Try to open it as a Serial port
+                }
             } else if (arg1.getAction().equals(ACTION_USB_DETACHED)) {
                 // Usb device was disconnected. send an intent to the Main Activity
+                UsbDevice dev = (UsbDevice)arg1.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                Timber.i("ACTION_USB_DETACHED: EXTRA_DEVICE complete");
+                if (dev == device) {
                 Intent intent = new Intent(ACTION_USB_DISCONNECTED);
                 arg0.sendBroadcast(intent);
                 serialPortConnected = false;
-                serialPort.close();
+                if (serialPort != null) serialPort.close();
+                device = null;
+                }
             }
         }
     };
@@ -187,12 +198,17 @@ public class UsbService extends Service {
     public void onCreate() {
         this.context = this;
         serialPortConnected = false;
+        mPrefs = (PrefHelper) getApplicationContext().getSystemService(PrefHelper.class.getName());
+
         UsbService.SERVICE_CONNECTED = true;
         registerReceiver(usbReceiver, getFilter());
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        findSerialPortDevice();
+        
 
-        mPrefs = (PrefHelper) getApplicationContext().getSystemService(PrefHelper.class.getName());
+       
+
+        findSerialPortDevice(null);
+        
         mSocketServer = new SocketServer(mPrefs.getNetworkPort(), this);
         makeForeground();
     }
@@ -231,9 +247,36 @@ public class UsbService extends Service {
         this.mHandler = mHandler;
     }
 
-    private void findSerialPortDevice() {
+
+    private void findSerialPortDevice(UsbDevice dev) {
+        String devNameFilter = mPrefs.getUsbDevFilter();
+            Timber.d("device filter: %s", devNameFilter);
+            String DevName = "";
+            int deviceVID,devicePID;
+        if (dev != null){
+            DevName = dev.getProductName();
+            deviceVID = dev.getVendorId();
+            devicePID = dev.getProductId();
+            Timber.d("Check device  from event. Name: %s ",DevName );
+            if (UsbSerialDevice.isSupported(dev) && (devNameFilter == "" || DevName.toLowerCase().contains(devNameFilter.toLowerCase()))) {
+                // There is a device connected to our Android device. Try to open it as a Serial Port.
+                if (usbManager.hasPermission(dev)){
+                    Timber.i("Has permission on device %s", dev.getProductName());
+                    //onPermissionGranted(getApplicationContext());
+                    device = dev;
+                    Intent intent = new Intent(ACTION_USB_PERMISSION_GRANTED);
+                    getApplicationContext().sendBroadcast(intent);
+
+                } else{
+                    Timber.i("No permission on device %s. Request...", dev.getProductName());
+                requestUserPermission(dev);
+                }
+            }
+         return;
+        }
         // This snippet will try to open the first encountered usb device connected, excluding usb root hubs
         HashMap<String, UsbDevice> usbDevices = null;
+        boolean deviceFound = false;
         try {
             usbDevices = usbManager.getDeviceList();
         } catch (Exception e) {
@@ -241,14 +284,20 @@ public class UsbService extends Service {
             return;
         }
         if (!usbDevices.isEmpty()) {
+            
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
-                device = entry.getValue();
-                int deviceVID = device.getVendorId();
-                int devicePID = device.getProductId();
+                dev = entry.getValue();
+                deviceVID = dev.getVendorId();
+                devicePID = dev.getProductId();
+                DevName = dev.getProductName();
+                
+                   Timber.d("Check device name: %s ",DevName );
 
-                if (UsbSerialDevice.isSupported(device)) {
+                if (UsbSerialDevice.isSupported(dev) && (devNameFilter == "" || DevName.toLowerCase().contains(devNameFilter.toLowerCase()))) {
                     // There is a device connected to our Android device. Try to open it as a Serial Port.
-                    if (usbManager.hasPermission(device)){
+                    deviceFound = true;
+                    device = dev;
+                    if (usbManager.hasPermission(dev)){
                         Timber.i("Has permission on device");
                         //onPermissionGranted(getApplicationContext());
                         Intent intent = new Intent(ACTION_USB_PERMISSION_GRANTED);
@@ -256,14 +305,12 @@ public class UsbService extends Service {
 
                     } else{
                         Timber.i("No permission on device. Request...");
-                    requestUserPermission();
+                    requestUserPermission(dev);
                     }
-                } else {
-                    connection = null;
-                    device = null;
+                    break;
                 }
             }
-            if (device == null) {
+            if (!deviceFound) {
                 // There is no USB devices connected (but usb host were listed). Send an intent to MainActivity.
                 Intent intent = new Intent(ACTION_NO_USB);
                 sendBroadcast(intent);
@@ -303,9 +350,10 @@ public class UsbService extends Service {
     /*
      * Request user permission. The response will be received in the BroadcastReceiver
      */
-    private void requestUserPermission() {
+    private void requestUserPermission(UsbDevice dev) {
+        device = dev;
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
-        usbManager.requestPermission(device, mPendingIntent);
+        usbManager.requestPermission(dev, mPendingIntent);
     }
 
 
